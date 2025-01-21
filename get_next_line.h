@@ -2,7 +2,7 @@
 #define GET_NEXT_LINE_H
 
 #ifndef BUFF_SIZE
-#define BUFF_SIZE 10
+#define BUFF_SIZE 15
 #endif
 #include <stdlib.h>
 #include <fcntl.h>   // For open

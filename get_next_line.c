@@ -5,15 +5,15 @@
 
 void get_next_line(int fd)
 {
-    char *buff;
+    char *read_data;
 
-    buff = malloc(BUFF_SIZE);
+    read_data = malloc(BUFF_SIZE);
     // if(!buff)
     //     return (NULL);
     
-    read(fd, buff, BUFF_SIZE );
+    read(fd, read_data, BUFF_SIZE );
 
-    write(1, buff, BUFF_SIZE);
+    write(1, read_data, BUFF_SIZE);
 }
 
 int main(int argc, char const *argv[])
