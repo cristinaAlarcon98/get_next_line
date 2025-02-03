@@ -12,7 +12,7 @@ typedef struct s_list
     struct s_list *next;
 }   t_list;
 #include <stdlib.h>
-#include <fcntl.h>   // For open
+#include <fcntl.h> 
 #include <unistd.h>
 
 #endif

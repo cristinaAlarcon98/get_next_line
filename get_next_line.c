@@ -1,73 +1,148 @@
-
 #include "get_next_line.h"
-#include <stdio.h>
 
-
-
-void *get_line(t_list *list)
+t_list *find_last_node(t_list *list)
 {
-    int str_len;
-    char    *next_str;
-
-    if(list == NULL)
+    if (list == NULL)
         return (NULL);
+     while (list -> next)
+     {
+        list = list ->next;
+     }
+       
+}
 
-    str_len = len_to_newline(list);
-    next_str = malloc(str_len + 1);
-    if(!next_str)
-        return (NULL)
+void append_line_to_list(t_list **list, char *buff)
+{
+    t_list *new_node;
+    t_list *last_node;
 
-    copy_str(list, next_str);
-    return (next_str);
+    last_node = find_last_node(*list);
+    new_node = malloc(sizeof(t_list));
+        if (new_node == NULL)
+            return NULL;
+    if (last_node == NULL)  
+        *list = new_node;
+    else
+        last_node ->next = new_node;
+    new_node -> str_buff = buff;
+    new_node ->next = NULL;
+    
+}
+
+int found_new_line(t_list *list)
+{
+    int i;
+    if (list == NULL)
+        return (NULL);
+    i = 0;
+    while (list)
+    {
+        while (list -> str_buff[i] && BUFF_SIZE > i)
+        {
+            if (list -> str_buff[i] == '\n')
+                return 1;
+            i++;
+        }
+        list = list -> next;
+    }
+    return (0);
 }
 
 
 
-void create_list(t_list **list, int fd)
+void *find_line(int fd, t_list **list)
 {
-    int char_read;
+    int chars_read;
     char *buff;
 
-    while(!found_newline(*list))
+    while (!found_new_line(*list))
     {
         buff = malloc(BUFF_SIZE + 1);
-        if (!buff)
-            return NULL;
-
-        char_read = read(fd, buff, BUFF_SIZE);
-        if(!char_read)
+        if(!buff)
+            return (NULL);
+        chars_read = read(fd, buff, BUFF_SIZE);
+        if (!chars_read)
         {
             free(buff);
-            return NULL;
+            return (NULL);
         }
-        buff[char_read] = '\0';
-        append(list, buff);
+        append_line_to_list(list, buff);    
     }
+    
 }
-char  *get_next_line(int fd)
-{
-    char *next_line;
-    static t_list  *list=NULL;
 
-    if (fd < 0 || BUFF_SIZE <= 0 || read(fd, next_line, BUFF_SIZE) < 0)
+char *get_line(t_list *list)
+{
+    int str_len;
+    char *line;
+    int i;
+    if (list == NULL)
+        return (NULL);
+    str_len = get_len_until_new_line(list);
+    line = malloc(str_len + 1);
+    if (line == NULL)
         return (NULL);
 
-
-    create_list(&list, fd);
-
-    if (list == NULL)
-        return(NULL);
-
-    next_line = get_line(list);
-
-    polish_list(&list);
-    return(next_line);
+    i = 0;
+    cpy_line_to_list(list, line);
+    
 }
 
-int main(int argc, char const *argv[])
+void cpy_line_to_list(t_list *list, char *line)
 {
-    int fd;
+    int i;
+    int j;
 
-    fd = open("text.txt", O_RDONLY);
-    get_next_line(fd);
+    j = 0;
+    while (list)
+    {
+        i = 0;
+        while (list -> str_buff[i])
+        {
+            if (list -> str_buff[i] == '\n')
+                line[j++] = '\n';
+                line[j] = '\0';
+
+            line[j] == list -> str_buff[i] ; 
+        }
+        list = list -> next;
+    }
+}
+
+int get_len_until_new_line(t_list *list)
+{
+    int counter;
+    int i;
+
+    counter = 0;
+    if (list == NULL)
+        return(NULL);
+    
+    while (list) 
+    {   
+        i = 0;
+        while(list -> str_buff[i])
+        {
+            if (list -> str_buff[i] == '\n')
+                counter++;
+                return(counter);
+            i++;
+            counter++;
+        }
+        list = list -> next;   
+    }
+    return (counter);
+}
+
+char get_next_line(int fd)
+{
+    static t_list *list = NULL;
+    char *next_line;
+
+    if (fd < 0 || BUFF_SIZE <= 0)
+        return NULL;
+    find_line(fd, &list);
+    if (list == NULL)
+        return (NULL);
+    next_line= get_line(list);
 }
